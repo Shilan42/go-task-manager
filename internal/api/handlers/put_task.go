@@ -35,7 +35,6 @@ func (s *APIServer) putTaskHandler(w http.ResponseWriter, r *http.Request) {
 	var task db.Task
 	// Декодируем JSON из тела запроса в структуру task
 	if err := json.NewDecoder(r.Body).Decode(&task); err != nil {
-		r.Body.Close()
 		api.WriteJSON(w, http.StatusBadRequest, map[string]string{
 			"error": fmt.Sprintf("invalid JSON payload: %v", err),
 		})

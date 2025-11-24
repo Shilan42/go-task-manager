@@ -1,5 +1,5 @@
 # ЭТАП 1: сборка в образе golang (работает как компилятор)
-FROM golang:1.25 AS builder
+FROM golang:1.25.3 AS builder
 
 # Устанавливаем рабочую директорию внутри контейнера
 WORKDIR /app
@@ -17,18 +17,14 @@ RUN go mod download
 RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -a -installsuffix cgo -o go-task-manager
 
 # ЭТАП 2: финальный образ (без инструментов сборки)
-FROM ubuntu:latest
+FROM alpine:latest
 
 # Устанавливаем необходимые зависимости (если нужны)
-RUN apt-get update && \
-    apt-get install -y ca-certificates && \
-    rm -rf /var/lib/apt/lists/*
+RUN apk update && apk add --no-cache ca-certificates
 
 # Определяем переменные окружения
 ENV TODO_PORT=7540
 ENV TODO_DBFILE=/app/scheduler.db
-ENV TODO_PASSWORD=changeme
-ENV JWT_SECRET=changeme
 
 # Создаём рабочую директорию
 WORKDIR /app
@@ -40,7 +36,7 @@ COPY --from=builder /app/go-task-manager /app/go-task-manager
 COPY web /app/web
 
 # Открываем порт
-EXPOSE $TODO_PORT
+EXPOSE 7540
 
 # Команда запуска с явным указанием пути и аргументов (если нужны)
 CMD ["/app/go-task-manager"]

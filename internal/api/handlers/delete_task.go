@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"go-task-manager-final_project/internal/api"
 	"go-task-manager-final_project/internal/db"
+	"strconv"
 
 	"net/http"
 	"strings"
@@ -32,7 +33,7 @@ func (s *APIServer) deleteTaskHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Проверяем формат ID (числовой)
-	if !api.IsValidID(id) {
+	if _, err := strconv.Atoi(id); err != nil {
 		api.WriteJSON(w, http.StatusBadRequest, map[string]string{
 			"error": "invalid id format: must be a integer number",
 		})

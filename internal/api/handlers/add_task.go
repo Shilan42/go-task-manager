@@ -10,7 +10,7 @@ import (
 
 	"go-task-manager-final_project/internal/api"
 	"go-task-manager-final_project/internal/db"
-	"go-task-manager-final_project/internal/services"
+	"go-task-manager-final_project/internal/scheduler"
 )
 
 // Функция проверяет и корректирует дату задачи.
@@ -20,25 +20,25 @@ import (
 func checkDate(task *db.Task) error {
 	now := time.Now()
 
-	// Если дата не указана или равна "today", устанавливаем текущую дату в формате services.DateFormat
+	// Если дата не указана или равна "today", устанавливаем текущую дату в формате scheduler.DateFormat
 	if task.Date == "" || task.Date == "today" {
-		task.Date = now.Format(services.DateFormat)
+		task.Date = now.Format(scheduler.DateFormat)
 	}
 
-	// Преобразуем строку с датой в объект time.Time по формату services.DateFormat
-	t, err := time.Parse(services.DateFormat, task.Date)
+	// Преобразуем строку с датой в объект time.Time по формату scheduler.DateFormat
+	t, err := time.Parse(scheduler.DateFormat, task.Date)
 	if err != nil {
 		return err
 	}
 
 	// Проверяем, не превышает ли дата текущую (t > now)
-	if services.AfterNow(now, t) {
+	if scheduler.AfterNow(now, t) {
 		if task.Repeat == "" {
 			// Если повторение не задано, устанавливаем текущую дату
-			task.Date = now.Format(services.DateFormat)
+			task.Date = now.Format(scheduler.DateFormat)
 		} else {
 			// Если задано повторение, вычисляем следующую допустимую дату выполнения
-			next, err := services.NextDate(now, task.Date, task.Repeat)
+			next, err := scheduler.NextDate(now, task.Date, task.Repeat)
 			if err != nil {
 				return err
 			}
@@ -70,15 +70,12 @@ func (s *APIServer) addTaskHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Декодируем JSON из тела запроса в структуру задачи
 	if err := json.NewDecoder(r.Body).Decode(&task); err != nil {
-		r.Body.Close()
 		api.WriteJSON(w, http.StatusBadRequest, map[string]string{
 			"error": "invalid JSON payload",
 		})
 		// Завершаем обработку из‑за некорректного JSON
 		return
 	}
-	// Закрываем тело после успешного декодирования
-	r.Body.Close()
 
 	// Проверяем, что поле Title не пустое (обязательное поле)
 	if task.Title == "" {

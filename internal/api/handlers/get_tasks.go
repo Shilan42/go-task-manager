@@ -3,7 +3,7 @@ package handlers
 import (
 	"go-task-manager-final_project/internal/api"
 	"go-task-manager-final_project/internal/db"
-	"go-task-manager-final_project/internal/services"
+	"go-task-manager-final_project/internal/scheduler"
 
 	"net/http"
 	"strings"
@@ -16,6 +16,8 @@ type TasksResp struct {
 	Tasks []*db.Task `json:"tasks"`
 }
 
+const limit = 50
+
 // tasksHandler - обработчик HTTP-запросов для получения списка задач.
 // Поддерживает фильтрацию по поисковому запросу (поиск по заголовку, комментарию или дате).
 // Параметры:
@@ -26,7 +28,7 @@ func (s *APIServer) tasksHandler(w http.ResponseWriter, r *http.Request) {
 	searchQuery := r.URL.Query().Get("search")
 
 	// Вызываем БД для получения списка задач (максимум 50 записей)
-	tasks, err := db.GetTasks(s.DB, 50)
+	tasks, err := db.GetTasks(s.DB, limit)
 	if err != nil {
 		// Возвращаем HTTP 500 с сообщением об ошибке
 		api.WriteJSON(w, http.StatusInternalServerError, map[string]string{
@@ -44,9 +46,9 @@ func (s *APIServer) tasksHandler(w http.ResponseWriter, r *http.Request) {
 	if searchQuery != "" {
 		filteredTasks := []*db.Task{}
 
-		// Проверяем, является ли searchQuery датой в формате services.DateFormat
+		// Проверяем, является ли searchQuery датой в формате scheduler.DateFormat
 		isDate := false
-		parsedDate, err := time.Parse(services.DateFormat, searchQuery)
+		parsedDate, err := time.Parse(scheduler.DateFormat, searchQuery)
 		if err == nil {
 			isDate = true
 		}
@@ -61,7 +63,7 @@ func (s *APIServer) tasksHandler(w http.ResponseWriter, r *http.Request) {
 		for _, task := range tasks {
 			if isDate {
 				// Преобразуем строку из задачи в time.Time
-				taskDate, err := time.Parse(services.DateFormat, task.Date)
+				taskDate, err := time.Parse(scheduler.DateFormat, task.Date)
 				if err != nil {
 					taskDate, err = time.Parse("02.01.2006", task.Date)
 					if err != nil {

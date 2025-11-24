@@ -32,8 +32,8 @@ func Auth(next http.HandlerFunc) http.HandlerFunc {
 				return
 			}
 
-			// Получаем секрет для подписи JWT из переменной окружения JWT_SECRET.
-			jwtSecret := os.Getenv("JWT_SECRET")
+			// Получаем секрет для подписи JWT из переменной окружения TODO_JWT_SECRET.
+			jwtSecret := os.Getenv("TODO_JWT_SECRET")
 			if jwtSecret == "" {
 				api.WriteJSON(w, http.StatusInternalServerError, map[string]string{
 					"error": "JWT secret not configured",

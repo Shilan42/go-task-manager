@@ -63,9 +63,9 @@ func handleSignIn(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Получаем секрет для подписи JWT из переменной окружения JWT_SECRET.
-	// Если переменная не задана, используем значение по умолчанию "bobr_kurwa".
-	jwtSecret := os.Getenv("JWT_SECRET")
+	// Получаем секрет для подписи JWT из переменной окружения TODO_JWT_SECRET.
+	// Если переменная не задана, возвращаем ошибку 500 (Internal Server Error).
+	jwtSecret := os.Getenv("TODO_JWT_SECRET")
 	if jwtSecret == "" {
 		api.WriteJSON(w, http.StatusInternalServerError, map[string]string{
 			"error": "JWT secret not configured",

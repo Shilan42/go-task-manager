@@ -84,7 +84,7 @@
    Задайте переменные в текущей сессии:
    ```bash
    export TODO_PASSWORD=012345
-   export JWT_SECRET=bobr
+   export TODO_JWT_SECRET=bobr
    ```
 
    **Способ 2. Через файл `.env`**  
@@ -92,7 +92,7 @@
    - Добавьте переменные в формате `КЛЮЧ=значение`:
      ```bash
      TODO_PASSWORD=012345
-     JWT_SECRET=bobr
+     TODO_JWT_SECRET=bobr
      ```
    - Убедитесь, что файл не попадает в репозиторий (добавьте `.env` в `.gitignore`).
 
@@ -157,7 +157,7 @@
      -e TODO_PORT=7540 \
      -e TODO_DBFILE=/app/scheduler.db \
      -e TODO_PASSWORD=012345 \
-     -e JWT_SECRET=bobr \
+     -e TODO_JWT_SECRET=bobr \
      go-task-manager
    ```
 
@@ -165,7 +165,7 @@
    ```bash
    docker run -p 7540:7540 \
      -e TODO_PASSWORD=012345 \
-     -e JWT_SECRET=bobr \
+     -e TODO_JWT_SECRET=bobr \
      go-task-manager
    ```
 

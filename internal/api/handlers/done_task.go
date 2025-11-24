@@ -5,8 +5,9 @@ import (
 	"fmt"
 	"go-task-manager-final_project/internal/api"
 	"go-task-manager-final_project/internal/db"
-	"go-task-manager-final_project/internal/services"
+	"go-task-manager-final_project/internal/scheduler"
 	"net/http"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -29,7 +30,7 @@ func (s *APIServer) doneTaskHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Проверяем формат ID (числовой)
-	if !api.IsValidID(id) {
+	if _, err := strconv.Atoi(id); err != nil {
 		api.WriteJSON(w, http.StatusBadRequest, map[string]string{
 			"error": "invalid id format: must be a integer number",
 		})
@@ -79,7 +80,7 @@ func (s *APIServer) doneTaskHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Задача периодическая - нужно вычислить следующую дату выполнения
 	// Используем текущую дату, дату задачи и правило повторения
-	next, err := services.NextDate(time.Now(), task.Date, task.Repeat)
+	next, err := scheduler.NextDate(time.Now(), task.Date, task.Repeat)
 	if err != nil {
 		// Ошибка при расчёте даты (например, некорректный формат Repeat) - возвращаем 400
 		api.WriteJSON(w, http.StatusBadRequest, map[string]string{

@@ -3,14 +3,14 @@ package handlers
 import (
 	"fmt"
 	"go-task-manager-final_project/internal/api"
-	"go-task-manager-final_project/internal/services"
+	"go-task-manager-final_project/internal/scheduler"
 	"net/http"
 	"time"
 )
 
 // nextDayHandler обрабатывает HTTP‑запрос на вычисление следующей даты по правилу повторения.
 // Ожидает GET‑запрос с параметрами:
-// - now (текущая дата в формате services.DateFormat);
+// - now (текущая дата в формате scheduler.DateFormat);
 // - date (стартовая дата в текстовом формате);
 // - repeat (правило повторения, определяющее периодичность).
 // Возвращает:
@@ -24,8 +24,8 @@ func handleNextDay(w http.ResponseWriter, r *http.Request) {
 	repeat := r.FormValue("repeat")
 
 	// Парсим строку с текущей датой в тип time.Time
-	// Используем формат, определённый в пакете services (services.DateFormat)
-	now, err := time.Parse(services.DateFormat, nowString)
+	// Используем формат, определённый в пакете scheduler (scheduler.DateFormat)
+	now, err := time.Parse(scheduler.DateFormat, nowString)
 	if err != nil {
 		// Если формат даты некорректен, возвращаем ошибку 400 Bad Request
 		api.WriteJSON(w, http.StatusBadRequest, map[string]string{
@@ -34,9 +34,9 @@ func handleNextDay(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Вычисляем следующую дату с помощью функции из пакета services
+	// Вычисляем следующую дату с помощью функции из пакета scheduler
 	// Функция учитывает текущую дату, стартовую дату и правило повторения
-	nextDate, err := services.NextDate(now, date, repeat)
+	nextDate, err := scheduler.NextDate(now, date, repeat)
 	if err != nil {
 		// При ошибке в вычислении даты возвращаем ошибку 400 с описанием
 		api.WriteJSON(w, http.StatusBadRequest, map[string]string{

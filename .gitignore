@@ -5,3 +5,4 @@
 *.yaml
 *.db
 !.env.example
+.vs/
