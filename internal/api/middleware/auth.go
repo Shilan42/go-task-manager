@@ -3,9 +3,9 @@ package middleware
 import (
 	"crypto/sha256"
 	"fmt"
+	"go-task-manager-final_project/config"
 	"go-task-manager-final_project/internal/api"
 	"net/http"
-	"os"
 
 	"github.com/golang-jwt/jwt/v5"
 )
@@ -17,11 +17,9 @@ import (
 // http.HandlerFunc - обернутый обработчик с логикой авторизации.
 func Auth(next http.HandlerFunc) http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		// Получаем значение пароля из переменной окружения TODO_PASSWORD.
-		storedPassword := os.Getenv("TODO_PASSWORD")
 
 		// Если пароль задан, выполняем проверку авторизации.
-		if storedPassword != "" {
+		if config.Password != "" {
 			// Пытаемся получить cookie с именем "token" из запроса.
 			cookie, err := r.Cookie("token")
 			if err != nil {
@@ -32,15 +30,14 @@ func Auth(next http.HandlerFunc) http.HandlerFunc {
 				return
 			}
 
-			// Получаем секрет для подписи JWT из переменной окружения TODO_JWT_SECRET.
-			jwtSecret := os.Getenv("TODO_JWT_SECRET")
-			if jwtSecret == "" {
+			// Если переменная не задана, возвращаем ошибку 500 (Internal Server Error).
+			if config.JWTSecret == "" {
 				api.WriteJSON(w, http.StatusInternalServerError, map[string]string{
 					"error": "JWT secret not configured",
 				})
 				return
 			}
-			secret := []byte(jwtSecret)
+			secret := []byte(config.JWTSecret)
 
 			// Парсим JWT-токен из значения cookie.
 			token, err := jwt.Parse(cookie.Value, func(token *jwt.Token) (interface{}, error) {
@@ -70,7 +67,7 @@ func Auth(next http.HandlerFunc) http.HandlerFunc {
 			}
 
 			// Вычисляем SHA-256 хэш текущего пароля из окружения.
-			currentHash := sha256.Sum256([]byte(storedPassword))
+			currentHash := sha256.Sum256([]byte(config.Password))
 			currentHashStr := fmt.Sprintf("%x", currentHash)
 
 			// Сравниваем хэш пароля из токена с текущим хэшем пароля.

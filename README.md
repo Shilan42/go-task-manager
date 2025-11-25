@@ -83,16 +83,16 @@
    **Способ 1. Через переменные оболочки**  
    Задайте переменные в текущей сессии:
    ```bash
-   export TODO_PASSWORD=012345
-   export TODO_JWT_SECRET=bobr
+   export TODO_PASSWORD=12345
+   export TODO_JWT_SECRET=secret
    ```
 
    **Способ 2. Через файл `.env`**  
    - Создайте файл `.env` в корневой директории проекта.  
    - Добавьте переменные в формате `КЛЮЧ=значение`:
      ```bash
-     TODO_PASSWORD=012345
-     TODO_JWT_SECRET=bobr
+     TODO_PASSWORD=12345
+     TODO_JWT_SECRET=secret
      ```
    - Убедитесь, что файл не попадает в репозиторий (добавьте `.env` в `.gitignore`).
 
@@ -156,16 +156,16 @@
    docker run -p 7540:7540 \
      -e TODO_PORT=7540 \
      -e TODO_DBFILE=/app/scheduler.db \
-     -e TODO_PASSWORD=012345 \
-     -e TODO_JWT_SECRET=bobr \
+     -e TODO_PASSWORD=12345 \
+     -e TODO_JWT_SECRET=secret \
      go-task-manager
    ```
 
 3. Запустите контейнер с частичным переопределением (рекомендуется):
    ```bash
    docker run -p 7540:7540 \
-     -e TODO_PASSWORD=012345 \
-     -e TODO_JWT_SECRET=bobr \
+     -e TODO_PASSWORD=12345 \
+     -e TODO_JWT_SECRET=secret \
      go-task-manager
    ```
 

@@ -4,9 +4,9 @@ import (
 	"crypto/sha256"
 	"encoding/json"
 	"fmt"
+	"go-task-manager-final_project/config"
 	"go-task-manager-final_project/internal/api"
 	"net/http"
-	"os"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
@@ -44,10 +44,8 @@ func handleSignIn(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Получаем мастер-пароль из переменной окружения TODO_PASSWORD.
 	// Если переменная не задана, возвращаем ошибку 500 (Internal Server Error).
-	masterPass := os.Getenv("TODO_PASSWORD")
-	if masterPass == "" {
+	if config.Password == "" {
 		api.WriteJSON(w, http.StatusInternalServerError, map[string]string{
 			"error": "TODO_PASSWORD environment variable is not set",
 		})
@@ -56,23 +54,21 @@ func handleSignIn(w http.ResponseWriter, r *http.Request) {
 
 	// Сравниваем пароль из запроса с мастер-паролем.
 	// Если пароли не совпадают, возвращаем ошибку 401 (Unauthorized).
-	if req.Password != masterPass {
+	if req.Password != config.Password {
 		api.WriteJSON(w, http.StatusUnauthorized, map[string]string{
 			"error": "incorrect password",
 		})
 		return
 	}
 
-	// Получаем секрет для подписи JWT из переменной окружения TODO_JWT_SECRET.
 	// Если переменная не задана, возвращаем ошибку 500 (Internal Server Error).
-	jwtSecret := os.Getenv("TODO_JWT_SECRET")
-	if jwtSecret == "" {
+	if config.JWTSecret == "" {
 		api.WriteJSON(w, http.StatusInternalServerError, map[string]string{
 			"error": "JWT secret not configured",
 		})
 		return
 	}
-	secret := []byte(jwtSecret)
+	secret := []byte(config.JWTSecret)
 
 	// Вычисляем хэш пароля с помощью алгоритма SHA-256.
 	hash := sha256.Sum256([]byte(req.Password))

@@ -3,6 +3,7 @@ package server
 import (
 	"database/sql"
 	"fmt"
+	"go-task-manager-final_project/config"
 	"go-task-manager-final_project/internal/api/handlers"
 	"log"
 	"net/http"
@@ -26,16 +27,15 @@ const (
 // - int: номер порта (в диапазоне [minPort, maxPort]);
 // - error: ошибка, если порт невалидный (не число или вне диапазона).
 func GetPort() (int, error) {
-	portStr := os.Getenv("TODO_PORT")
-	if portStr == "" {
-		// Если переменная окружения не задана, используем порт по умолчанию
-		portStr = defaultPort
+	// Если переменная окружения не задана, используем порт по умолчанию
+	if config.Port == "" {
+		config.Port = defaultPort
 	}
 
-	port, err := strconv.Atoi(portStr)
+	port, err := strconv.Atoi(config.Port)
 	if err != nil {
 		// Если порт не является числом
-		return 0, fmt.Errorf("invalid port format: %s", portStr)
+		return 0, fmt.Errorf("invalid port format: %s", config.Port)
 	}
 	// Если порт за пределами допустимого диапазона
 	if port < minPort || port > maxPort {
