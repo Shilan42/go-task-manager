@@ -1,0 +1,8 @@
+.env
+.env.*
+*.local
+*.yml
+*.yaml
+*.db
+!.env.example
+.vs/
