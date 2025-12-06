@@ -59,7 +59,7 @@ func (s *APIServer) addTaskHandler(w http.ResponseWriter, r *http.Request) {
 	contentType := r.Header.Get("Content-Type")
 
 	// Проверяем, что Content-Type начинается с "application/json" (с учётом регистра)
-	if !strings.EqualFold(strings.TrimSpace(contentType), "application/json") {
+	if !strings.HasPrefix(strings.TrimSpace(contentType), "application/json") {
 		api.WriteJSON(w, http.StatusUnsupportedMediaType, map[string]string{
 			"error": "content type must be application/json",
 		})
